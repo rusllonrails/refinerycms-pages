@@ -30,6 +30,24 @@ module Refinery
       end
     end
 
+    def categories_layout_class(categories_count)
+      # five columns by default
+      categories_layout = 5
+      if @categories.count > 5
+        if categories_count == 6
+          # three columns
+          categories_layout = 3
+        elsif categories_count % 4 == 0 || (categories_count % 4 > 2 && categories_count % 5 != 0)
+          # four columns
+          categories_layout = 4
+        end
+      else
+        categories_layout = "justify"
+      end
+
+      return "category-layout-#{categories_layout}"
+    end
+
     # This action can be accessed normally, or as nested pages.
     # Assuming a page named "mission" that is a child of "about",
     # you can access the pages with the following URLs:
