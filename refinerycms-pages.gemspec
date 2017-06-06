@@ -1,5 +1,5 @@
 # Encoding: UTF-8
-require File.expand_path('/home/alkapone/.rvm/gems/ruby-2.3.1@en/gems/refinerycms-core-3.0.5/lib/refinery/version', __FILE__)
+require File.expand_path('../../core/lib/refinery/version', __FILE__)
 
 version = Refinery::Version.to_s
 
