@@ -27,8 +27,6 @@ Gem::Specification.new do |s|
   s.add_dependency 'speakingurl-rails',           '~> 8.0.0'
   s.add_dependency 'diffy',                       '~> 3.1.0'
 
-  s.required_ruby_version = "2.3.1"
-
   s.cert_chain  = [File.expand_path("../../certs/parndt.pem", __FILE__)]
   if $0 =~ /gem\z/ && ARGV.include?("build") && ARGV.include?(__FILE__)
     s.signing_key = File.expand_path("~/.ssh/gem-private_key.pem")
