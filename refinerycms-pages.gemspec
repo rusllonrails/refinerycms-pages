@@ -1,7 +1,6 @@
 # Encoding: UTF-8
-require File.expand_path('../../core/lib/refinery/version', __FILE__)
 
-version = Refinery::Version.to_s
+version = "3.0.5"
 
 Gem::Specification.new do |s|
   s.platform          = Gem::Platform::RUBY
