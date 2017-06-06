@@ -16,7 +16,18 @@ module Refinery
 
     # This action is usually accessed with the root path, normally '/'
     def home
-      render_with_templates?
+      if is_marketplace?
+        check_if_user_need_to_change_password!
+
+        @posts = Refinery::Blog::Post.live.limit(5)
+        @page = Refinery::Page.first
+        @categories = Refinery::Marketplaces::Category.all
+        @categories_layout_class = categories_layout_class(@categories.count)
+
+        render template: "/refinery/marketplaces/pages/home"
+      else
+        render_with_templates?
+      end
     end
 
     # This action can be accessed normally, or as nested pages.
