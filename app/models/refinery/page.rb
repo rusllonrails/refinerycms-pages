@@ -366,8 +366,6 @@ module Refinery
     #
     # Will return the body page part of the first page.
     def content_for(part_slug)
-      Rails.logger.info "content_for(part_slug)-------------------------#{part_slug}"
-
       part_with_slug(part_slug).try(:body)
     end
 
@@ -392,7 +390,6 @@ module Refinery
       # self.parts is usually already eager loaded so we can now just grab
       # the first element matching the title we specified.
       self.parts.detect do |part|
-        Rails.logger.info "part_with_slug(part_slug)-------------------------#{part.inspect}"
         part.slug_matches?(part_slug)
       end
     end
