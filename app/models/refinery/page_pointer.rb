@@ -22,10 +22,6 @@ module Refinery
       self.class.where(parent_id: page_id).order('lft ASC')
     end
 
-    def id
-      page_id
-    end
-
     def nested_url
       JSON.parse(super())
     end

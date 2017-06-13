@@ -1,10 +1,10 @@
 <% # setup params for various action links
-  add_url =   refinery.new_admin_page_path(parent_id: page.id)
+  add_url =   refinery.new_admin_page_path(parent_id: page.page_id)
   edit_url =  refinery.admin_edit_page_path(page.nested_url, switch_locale: :en)
   delete_url = refinery.admin_delete_page_path(page.nested_url)
   delete_options = {
      class: "cancel confirm-delete",
-            data: {confirm: t('message',  scope: 'refinery.admin.delete', title: translated_field(page, :title))}
+            data: {confirm: t('message',  scope: 'refinery.admin.delete', title: page.title)}
           }
  %>
 

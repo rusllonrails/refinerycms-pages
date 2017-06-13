@@ -58,8 +58,7 @@ module Refinery
       end
 
       def update
-        if @page.update_attributes(page_params)
-          @page.update_page_pointer!
+        if @page.update(page_params)
           flash.notice = t('refinery.crudify.updated', what: "'#{@page.title}'")
 
           if from_dialog?
@@ -124,7 +123,15 @@ module Refinery
       end
 
       def page_params
-        params.require(:page).permit(permitted_page_params)
+        ops = params.require(:page).permit(permitted_page_params)
+
+        if params[:page][:plan_ids_attributes].present?
+          ops.merge!({
+            plan_ids_attributes: params[:page][:plan_ids_attributes]
+          })
+        end
+
+        ops
       end
 
       def new_page_params
@@ -155,6 +162,7 @@ module Refinery
           :source_id,
           :show_in_footer,
           :members_only,
+          :plan_ids_attributes,
           like_attributes: [:header, :intro, :text, :_destroy, :id],
           parts_attributes: [:id, :title, :slug, :body, :position]
         ]

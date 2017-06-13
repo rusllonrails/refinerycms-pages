@@ -34,7 +34,8 @@ module Refinery
                     :source_id,
                     :show_in_footer,
                     :members_only,
-                    :like_attributes
+                    :like_attributes,
+                    :plan_ids_attributes
 
     attr_accessor :open_graph_title,
                   :open_graph_description,
@@ -56,8 +57,7 @@ module Refinery
     # POINTER GENERATION STUFF - BEGIN
     #
 
-    after_create :generate_page_pointer!
-    after_update :update_page_pointer!
+    after_save :generate_or_update_page_pointer!
     after_destroy :remove_page_pointer!
 
     def pointer_ops
@@ -79,16 +79,20 @@ module Refinery
       }
     end
 
-    def generate_page_pointer!
-      Refinery::PagePointer.create!(pointer_ops.merge!({page_id: id}))
+    def generate_or_update_page_pointer!
+      if pointer.blank?
+        Refinery::PagePointer.create!(pointer_ops.merge!({page_id: id}))
+      end
+
+      Rails.logger.info "-----------------------------------------------"
+      Rails.logger.info " #{pointer_ops.inspect}"
+      Rails.logger.info "-----------------------------------------------"
+
+      pointer.update!(pointer_ops)
     end
 
     def pointer
       Refinery::PagePointer.find_by(page_id: id)
-    end
-
-    def update_page_pointer!
-      pointer.update!(pointer_ops)
     end
 
     def remove_page_pointer!
