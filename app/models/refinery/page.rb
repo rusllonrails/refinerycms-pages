@@ -16,6 +16,26 @@ module Refinery
     attr_accessible :source_id
     attr_accessible :plan_ids_attributes
 
+    attr_accessible :parent_id,
+                    :browser_title,
+                    :draft,
+                    :link_url,
+                    :menu_title,
+                    :meta_description,
+                    :skip_to_first_child,
+                    :show_in_menu,
+                    :title,
+                    :view_template,
+                    :layout_template,
+                    :custom_slug,
+                    :parts_attributes,
+                    :copywriting_phrases_attributes,
+                    :no_payment_required,
+                    :source_id,
+                    :show_in_footer,
+                    :members_only,
+                    :like_attributes
+
     attr_accessor :open_graph_title,
                   :open_graph_description,
                   :open_graph_image,
@@ -31,6 +51,67 @@ module Refinery
 
     after_find :set_open_graph_defaults
     after_initialize :default_crumbs
+
+    #
+    # POINTER GENERATION STUFF - BEGIN
+    #
+
+    after_create :generate_page_pointer!
+    after_update :update_page_pointer!
+    after_destroy :remove_page_pointer!
+
+    def pointer_ops
+      {
+        parent_id: parent_id,
+        path: path,
+        slug: slug,
+        custom_slug: custom_slug,
+        link_url: link_url,
+        lft: lft,
+        rgt: rgt,
+        depth: depth,
+        title: title,
+        nested_url: uncached_nested_url,
+        deletable: deletable?,
+        draft: draft?,
+        skip_to_first_child: skip_to_first_child?,
+        show_in_menu: show_in_menu?
+      }
+    end
+
+    def generate_page_pointer!
+      Refinery::PagePointer.create!(pointer_ops.merge!({page_id: id}))
+    end
+
+    def pointer
+      Refinery::PagePointer.find_by(page_id: id)
+    end
+
+    def update_page_pointer!
+      pointer.update!(pointer_ops)
+    end
+
+    def remove_page_pointer!
+      #
+      # destroy / delete would not work for that case
+      # as we overrided id method in PagePointer model
+      #
+      ::ActiveRecord::Base.connection.execute(
+        "DELETE FROM page_pointers WHERE page_pointers.page_id = #{id}"
+      )
+    end
+
+    class << self
+      def populate_initial_pointers!
+        all.each do |page|
+          page.generate_page_pointer!
+        end
+      end
+    end
+
+    #
+    # POINTER GENERATION STUFF - END
+    #
 
     def self.footer_menu_pages
       where(show_in_footer: true).order(footer_order: :asc)
@@ -166,6 +247,7 @@ module Refinery
       # raise ActiveRecord::RecordNotFound if not found.
       def find_by_path_or_id!(path, id)
         page = find_by_path_or_id(path, id)
+        page = where(slug: path).first if page.blank?
 
         raise ActiveRecord::RecordNotFound unless page
 

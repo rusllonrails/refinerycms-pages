@@ -9,6 +9,14 @@ module Refinery
 
       helper_method :valid_layout_templates, :valid_view_templates
 
+      def index
+        #
+        # We were implemented PagePointer
+        # in order to make refinery/pages section work faster
+        #
+        @pages = Refinery::PagePointer.roots.order('lft ASC')
+      end
+
       def new
         @page = Page.new(new_page_params)
         Pages.default_parts_for(@page).each_with_index do |page_part, index|
@@ -21,8 +29,37 @@ module Refinery
         render :layout => false
       end
 
+      def create
+        @page = Refinery::Page.new(page_params)
+
+        if @page.save!
+          flash.notice = t('refinery.crudify.created', what: "'#{@page.title}'")
+
+          if params[:continue_editing] =~ /true|on|1/
+            if request.xhr?
+              render partial: 'save_and_continue_callback',
+                     locals: save_and_continue_locals(@page)
+            else
+              redirect_to :back
+            end
+          else
+            redirect_back_or_default(refinery.admin_pages_path)
+          end
+        else
+          if request.xhr?
+            render :partial => '/refinery/admin/error_messages', :locals => {
+              :object => @page,
+              :include_object_name => true
+            }
+          else
+            render 'new'
+          end
+        end
+      end
+
       def update
         if @page.update_attributes(page_params)
+          @page.update_page_pointer!
           flash.notice = t('refinery.crudify.updated', what: "'#{@page.title}'")
 
           if from_dialog?
@@ -98,9 +135,28 @@ module Refinery
 
       def permitted_page_params
         [
-          :browser_title, :draft, :link_url, :menu_title, :meta_description,
-          :parent_id, :skip_to_first_child, :show_in_menu, :title, :view_template,
-          :layout_template, :custom_slug, parts_attributes: [:id, :title, :slug, :body, :position]
+          :browser_title,
+          :draft,
+          :link_url,
+          :menu_title,
+          :meta_description,
+          :parent_id,
+          :skip_to_first_child,
+          :show_in_menu,
+          :title,
+          :view_template,
+          :layout_template,
+          :custom_slug,
+          :menu_title,
+          :meta_description,
+          :custom_slug,
+          :copywriting_phrases_attributes,
+          :no_payment_required,
+          :source_id,
+          :show_in_footer,
+          :members_only,
+          like_attributes: [:header, :intro, :text, :_destroy, :id],
+          parts_attributes: [:id, :title, :slug, :body, :position]
         ]
       end
 

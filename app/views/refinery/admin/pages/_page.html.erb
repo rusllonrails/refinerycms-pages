@@ -1,6 +1,6 @@
 <% # setup params for various action links
   add_url =   refinery.new_admin_page_path(parent_id: page.id)
-  edit_url =  refinery.admin_edit_page_path(page.nested_url, switch_locale: (page.translations.first.locale unless page.translated_to_default_locale?))
+  edit_url =  refinery.admin_edit_page_path(page.nested_url, switch_locale: :en)
   delete_url = refinery.admin_delete_page_path(page.nested_url)
   delete_options = {
      class: "cancel confirm-delete",
@@ -19,25 +19,9 @@
     <% end %>
 
     <span class='title <%= 'toggle' if page.children.present? %>'>
-      <%= translated_field(page, :title) %>
+      <%= page.title %>
       <%= page_meta_information page %>
     </span>
-
-    <% if Refinery::I18n.frontend_locales.many? %>
-      <span class='locales'>
-        <% page.translations.sort_by{ |t| Refinery::I18n.frontend_locales.index(t.locale)}.each do |translation| %>
-          <% if translation.title.present? %>
-            <%= link_to refinery.admin_edit_page_path(page.nested_url, switch_locale: translation.locale),
-                        class: 'locale', title: translation.locale.upcase do %>
-
-              <div class="<%=translation.locale %> locale_marker">
-                <%= locale_text_icon(translation.locale.upcase) %>
-              </div>
-            <% end %>
-          <% end %>
-        <% end %>
-      </span>
-    <% end %>
 
     <span class='actions'>
       <%= action_icon(:preview, page.url,   t('.view_live_html')) %>
