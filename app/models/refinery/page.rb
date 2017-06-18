@@ -108,7 +108,7 @@ module Refinery
     class << self
       def populate_initial_pointers!
         all.each do |page|
-          page.generate_page_pointer!
+          page.generate_or_update_page_pointer!
         end
       end
     end
