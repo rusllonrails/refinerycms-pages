@@ -72,13 +72,13 @@ module Refinery
         output = sanitize(input, scrubber: CustomScrubber.new(Refinery::Pages::whitelist_elements,
                                                               Refinery::Pages::whitelist_attributes))
 
-        if input != output
-          warning = "\n-- SANITIZED CONTENT WARNING --\n"
-          warning << "Refinery::Pages::SectionPresenter#wrap_content_in_tag\n"
-          warning << "HTML attributes and/or elements content has been sanitized\n"
-          warning << "#{::Diffy::Diff.new(input, output).to_s(:color)}\n"
-          warn warning
-        end
+        # if input != output
+        #   warning = "\n-- SANITIZED CONTENT WARNING --\n"
+        #   warning << "Refinery::Pages::SectionPresenter#wrap_content_in_tag\n"
+        #   warning << "HTML attributes and/or elements content has been sanitized\n"
+        #   warning << "#{::Diffy::Diff.new(input, output).to_s(:color)}\n"
+        #   warn warning
+        # end
 
         return output
       end
